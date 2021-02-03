@@ -15,6 +15,9 @@ using Services.Catalog.API.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using HealthChecks.UI.Client;
 
 namespace Services.Catalog.API
 {
@@ -34,7 +37,10 @@ namespace Services.Catalog.API
                 .AddCustomMVC(Configuration)
                 .AddCustomDbContext(Configuration)
                 .AddCustomOptions(Configuration)
-                .AddSwagger(Configuration);
+                .AddSwagger(Configuration)
+                .AddCustomHealthCheck(Configuration);
+
+
             services.AddApplicationInsightsTelemetry();
 
 
@@ -60,6 +66,16 @@ namespace Services.Catalog.API
             {
                 endpoints.MapDefaultControllerRoute();
                 endpoints.MapControllers();
+
+                endpoints.MapHealthChecks("/hc", new HealthCheckOptions()
+                {
+                    Predicate = _ => true,
+                    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+                });
+                endpoints.MapHealthChecks("/liveness", new HealthCheckOptions
+                {
+                    Predicate = r => r.Name.Contains("self")
+                });
             });
         }
     }
@@ -89,6 +105,26 @@ namespace Services.Catalog.API
                     .AllowAnyHeader()
                     .AllowCredentials());
             });
+
+            return services;
+        }
+
+        public static IServiceCollection AddCustomHealthCheck(this IServiceCollection services, IConfiguration configuration)
+        {
+            var hcBuilder = services.AddHealthChecks();
+
+            hcBuilder
+                .AddCheck("self", () => HealthCheckResult.Healthy())
+                .AddSqlServer(
+                    configuration["ConnectionString"],
+                    name: "CatalogDB-check",
+                    tags: new string[] { "catalogdb" });
+
+            hcBuilder
+                .AddRabbitMQ(
+                    $"amqp://{configuration["EventBusConnection"]}",
+                    name: "catalog-rabbitmqbus-check",
+                    tags: new string[] { "rabbitmqbus" });
 
             return services;
         }
