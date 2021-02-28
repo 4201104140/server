@@ -20,10 +20,10 @@ namespace Ordering.BackgroundTasks
 
         public virtual void ConfigureServices(IServiceCollection services)
         {
-            services
-                .Configure<BackgroundTaskSettings>(this.Configuration)
-                .AddOptions()
-                .AddHostedService();
+            //services
+            //    .Configure<BackgroundTaskSettings>(this.Configuration)
+            //    .AddOptions()
+            //    .AddHostedService();
 
         }
 

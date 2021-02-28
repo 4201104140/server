@@ -2,12 +2,15 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Services.Identity.API;
 using System.IO;
+using Services.Identity.API.Data;
+using Microsoft.Extensions.Options;
 
 string Namespace = typeof(Startup).Namespace;
 string AppName = Namespace.Substring(Namespace.LastIndexOf('.', Namespace.LastIndexOf('.') - 1) + 1);
@@ -16,8 +19,19 @@ var configuration = GetConfiguration();
 
 //try
 //{
-    var host = CreateHostBuilder(configuration, args);
-    host.Build().Start();
+    var host = CreateHostBuilder(configuration, args).Build();
+    host.MigrateDbContext<ApplicationDbContext>((context, services) =>
+    {
+
+        var env = services.GetService<IWebHostEnvironment>();
+        var logger = services.GetService<ILogger<ApplicationDbContextSeed>>();
+        var settings = services.GetService<IOptions<AppSettings>>();
+
+        new ApplicationDbContextSeed()
+            .SeedAsync(context, env, logger, settings)
+            .Wait();
+    });
+    host.Start();
     return 0;
 //}
 //catch (Exception ex)

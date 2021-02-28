@@ -42,7 +42,7 @@ namespace Ordering.BackgroundTasks.Tasks
         {
             _logger.LogDebug("Checking confirmed grace period orders");
 
-            var orderIds = 
+            //var orderIds = 
         }
     }
 }

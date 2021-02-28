@@ -25,7 +25,7 @@
 
         public void AddDomainEvent(INotification eventItem)
         {
-            _domainEvents ??= new List<INotification>();
+            _domainEvents = _domainEvents ?? new List<INotification>();
             _domainEvents.Add(eventItem);
         }
 
@@ -46,7 +46,7 @@
 
         public override bool Equals(object obj)
         {
-            if (obj == null || obj is not Entity item)
+            if (obj == null || !(obj is Entity))
                 return false;
 
             if (Object.ReferenceEquals(this, obj))
@@ -54,6 +54,8 @@
 
             if (this.GetType() != obj.GetType())
                 return false;
+
+            Entity item = (Entity)obj;
 
             if (item.IsTransient() || this.IsTransient())
                 return false;
