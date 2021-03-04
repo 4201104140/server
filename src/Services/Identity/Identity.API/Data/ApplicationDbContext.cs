@@ -20,15 +20,4 @@ namespace Services.Identity.API.Data
             // Add your customizations after calling base.OnModelCreating(builder);
         }
     }
-
-    public class IdentityContextDesignFactory : IDesignTimeDbContextFactory<ApplicationDbContext>
-    {
-        public ApplicationDbContext CreateDbContext(string[] args)
-        {
-            var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>()
-                .UseSqlServer("Server=192.168.1.5,1434;User Id=sa;Password=Tai9800@@@@;Initial Catalog=Services.IdentityDb;");
-
-            return new ApplicationDbContext(optionsBuilder.Options);
-        }
-    }
 }

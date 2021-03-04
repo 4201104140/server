@@ -78,7 +78,7 @@ _TeamCity*
 .*crunch*.local.xml
 
 # Others
-sql/
+#sql/
 *.Cache
 ClientBin/
 [Ss]tyle[Cc]op.*
@@ -109,3 +109,4 @@ $RECYCLE.BIN/
 
 # Mac desktop service store files
 .DS_Store
+/src/Services/Server/src/Sql

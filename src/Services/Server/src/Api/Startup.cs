@@ -16,13 +16,15 @@ namespace Api
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public Startup(IWebHostEnvironment env, IConfiguration configuration)
         {
             CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("en-US");
             Configuration = configuration;
+            Environment = env;
         }
 
         public IConfiguration Configuration { get; private set; }
+        public IWebHostEnvironment Environment { get; set; }
 
         public void ConfigureServices(IServiceCollection services)
         {
@@ -30,6 +32,8 @@ namespace Api
             services.AddOptions();
 
             // Settings
+            var globalSettings = services.AddGlobalSettingsServices(Configuration);
+
 
             services.AddSqlServerRepositories();
 

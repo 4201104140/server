@@ -7,11 +7,11 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Services.Identity.API.Data;
 
-namespace Services.Identity.API.Migrations
+namespace Services.Identity.API.Migrations.ApplicationDb
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20210228140453_InitialMigration")]
-    partial class InitialMigration
+    [Migration("20210301012945_initApp")]
+    partial class initApp
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

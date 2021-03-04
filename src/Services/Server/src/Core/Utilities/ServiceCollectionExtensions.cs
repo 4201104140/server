@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -20,6 +21,15 @@ namespace Core.Utilities
 
                 });
             }
+        }
+
+        public static GlobalSettings AddGlobalSettingsServices(this IServiceCollection services,
+            IConfiguration configuration)
+        {
+            var globalSettings = new GlobalSettings();
+            ConfigurationBinder.Bind(configuration.GetSection("GlobalSettings"), globalSettings);
+            services.AddSingleton(s => globalSettings);
+            return globalSettings;
         }
     }
 }

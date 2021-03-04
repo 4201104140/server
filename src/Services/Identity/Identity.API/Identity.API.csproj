@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
-    <AssemblyName>Services.Identity.API</AssemblyName>
+    <!--<AssemblyName>Services.Identity.API</AssemblyName>-->
     <RootNamespace>Services.Identity.API</RootNamespace>
   </PropertyGroup>
 

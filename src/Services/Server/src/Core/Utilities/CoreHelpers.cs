@@ -39,6 +39,13 @@ namespace Core.Utilities
             return new Guid(guidArray);
         }
 
+        public static bool SettingHasValue(string setting)
+        {
+            var normalizedSetting = setting?.ToLowerInvariant();
+            return !string.IsNullOrWhiteSpace(normalizedSetting) && !normalizedSetting.Equals("secret") &&
+                !normalizedSetting.Equals("replace");
+        }
+
 
         public static string GetIpAddress(this Microsoft.AspNetCore.Http.HttpContext httpContext)
         {

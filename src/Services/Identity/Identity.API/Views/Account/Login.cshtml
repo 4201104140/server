@@ -1,0 +1,19 @@
+﻿@model Services.Identity.API.Models.AccountViewModels.LoginViewModel
+
+@{ 
+    ViewData["Title"] = "Log in";
+}
+
+<div>
+
+    <section>
+        <form asp-controller="Account" asp-action="Login" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post">
+            <input type="hidden" asp-for="ReturnUrl"/>
+
+            <input asp-for="Email" value="demouser@microsoft.com"/>
+            <input asp-for="Password" value="Pass@word1"/>
+
+            <button type="submit">Login</button>
+        </form>
+    </section>
+</div>
