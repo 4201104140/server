@@ -11,6 +11,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Microsoft.AspNetCore.Builder;
+using Grand.Core.DependencyInjection;
 
 namespace Grand.Core
 {
@@ -113,6 +115,86 @@ namespace Grand.Core
 
 
         }
+
+        /// <summary>
+        /// Add and configure services
+        /// </summary>
+        /// <param name="services">Collection of service descriptors</param>
+        /// <param name="configuration">Configuration root of the application</param>
+        /// <returns>Service provider</returns>
+        public static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
+        {
+            //find startup configurations provided by other assemblies
+            var typeFinder = new AppTypeFinder();
+            var startupConfigurations = typeFinder.FindClassesOfType<IGrandStartup>();
+
+            //create and sort instances of startup configurations
+            var instances = startupConfigurations
+                //.Where(startup => PluginManager.FindPlugin(startup).Return(plugin => plugin.Installed, true)) //ignore not installed plugins
+                .Select(startup => (IGrandStartup)Activator.CreateInstance(startup))
+                .OrderBy(startup => startup.Order);
+
+            //configure services
+            foreach (var instance in instances)
+                instance.ConfigureServices(services, configuration);
+
+
+        }
+
+        /// <summary>
+        /// Configure HTTP request pipeline
+        /// </summary>
+        /// <param name="application">Builder for configuring an application's request pipeline</param>
+        /// <param name="webHostEnvironment">WebHostEnvironment</param>
+        public static void ConfigureRequestPipeline(IApplicationBuilder application, IWebHostEnvironment webHostEnvironment)
+        {
+            //find startup configurations provided by other assemblies
+            var typeFinder = new AppTypeFinder();
+            var startupConfigurations = typeFinder.FindClassesOfType<IGrandStartup>();
+
+            //create and sort instances of startup configurations
+            var instances = startupConfigurations
+                //.Where(startup => PluginManager.FindPlugin(startup).Return(plugin => plugin.Installed, true)) //ignore not installed plugins
+                .Select(startup => (IGrandStartup)Activator.CreateInstance(startup))
+                .OrderBy(startup => startup.Order);
+
+            //configure request pipeline
+            foreach (var instance in instances)
+                instance.Configure(application, webHostEnvironment);
+        }
+
+        /// <summary>
+        /// ConfigureContainer is where you can register things directly
+        /// with Autofac. This runs after ConfigureServices so the things
+        /// here will override registrations made in ConfigureServices.
+        /// </summary>
+        /// <param name="serviceCollection">Service Collection</param>
+        /// <param name="configuration">Configuration</param>
+        public static void ConfigureContainer(IServiceCollection serviceCollection, IConfiguration configuration)
+        {
+            var typeFinder = new AppTypeFinder();
+
+            //register type finder
+            serviceCollection.AddSingleton<ITypeFinder>(typeFinder);
+
+            //find dependency registrars provided by other assemblies
+            var dependencyRegistrars = typeFinder.FindClassesOfType<IDependencyInjection>();
+
+            //create and sort instances of dependency registrars
+            var instances = dependencyRegistrars
+                //.Where(startup => PluginManager.FindPlugin(startup).Return(plugin => plugin.Installed, true)) //ignore not installed plugins
+                .Select(dependencyRegistrar => (IDependencyInjection)Activator.CreateInstance(dependencyRegistrar))
+                .OrderBy(dependencyRegistrar => dependencyRegistrar.Order);
+
+            var config = new GrandConfig();
+            configuration.GetSection("Grand").Bind(config);
+
+            //register all provided dependencies
+            foreach (var dependencyRegistrar in instances)
+                dependencyRegistrar.Register(serviceCollection, typeFinder, config);
+
+        }
         #endregion
+
     }
 }

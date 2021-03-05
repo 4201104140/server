@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Controllers\OData\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Grand.Core\Grand.Core.csproj" />
+  </ItemGroup>
+
+</Project>
